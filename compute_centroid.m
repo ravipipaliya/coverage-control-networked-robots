@@ -1,9 +1,9 @@
 % ---------------------------------------------------------------------- %
 % ---------------------------------------------------------------------- %
 % ---------------------------------------------------------------------- %
-function Cv = compute_centroid(px,py)
+function Cv = compute_centroid(px,py,ai)
 
-global n Fi ai;
+global n;
 
 % Compute local Voronoi region Vi
 % Truncate Vi to Vi_plus
@@ -18,6 +18,18 @@ for i = 1:n
     vy = v(vind,2)';
     pos_x = find(px==p(i,1));
     pos_y = find(py==p(i,2));
+
+    if pos_x == pos_y
+        % Reorder centroids based on robot order
+        [Cv(:,pos_x)] = dintegrate(vx,vy,p(i,:),ai(:,pos_x),pos_x);
+    else
+        disp('Mismatch in position found')
+        [Cv(:,pos_x)] = p(i,:)';
+    end
+end
+
+% scatter(Cv(1,:),Cv(2,:),'r*')
+
 
 % polyin = polyshape({x},{y});
 % [a,b] = centroid(polyin);
@@ -35,12 +47,3 @@ for i = 1:n
 % k = kappa*Ai(:,pos_x)
 %     f = @(x,y) eval(subs(k,q,[x;y]));
 %     intpoly(f,[0,1,2],[0,1,0])
-
-    if pos_x == pos_y
-        % Reorder centroids based on robot order
-        [Cv(:,pos_x)] = dintegrate(vx,vy,p(i,:),pos_x);
-    else
-        disp('Mismatch in position found')
-    end
-end
-% scatter(Cv(1,:),Cv(2,:),'r*')
