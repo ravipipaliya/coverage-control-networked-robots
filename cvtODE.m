@@ -4,6 +4,7 @@
 % Function that integrates the ODE model governing the robots' dynamics
 % ODE for Estimated centroidal voronoi tessalation
 function dz = cvtODE(t,z)
+
 global n h K Fi amin Tau g psi a kappa;
 
 % ------------------------------------------------- %
@@ -24,8 +25,6 @@ Cv = compute_centroid(px,py,ai); % Computes Fi as well
 % ---- Apply control input: ui = -K(Cvi - pi)- %
 dx = K(1,1)*(Cv(1,:)' - px);
 dy = K(2,2)*(Cv(2,:)' - py);
-% dx(abs(dx) > K(1,1)) = 0;
-% dy(abs(dy) > K(2,2)) = 0;
 
 % ---- Update ai ------------------------------- %
 T = delaunayTriangulation(px,py);
@@ -43,8 +42,6 @@ s = ai*L';
 for i = 1:n
     dai_pre = -(Fi(:,:,i)*ai(:,i)) - g*(Li(:,:,i)*ai(:,i) - li(:,i)) - psi*s(:,i);
     Iproji = zeros(9,1);
-%     Iproji(dai_pre <= 0 & ai(:,i) < amin) = 1;
-%     Iproji(dai_pre <= 0) = 1;
     Iproji(ai(:,i) + dai_pre*h <= amin) = 1;
 %     Iproji(ai(:,i) > amin) = 0;
 %     Iproji(ai(:,i) == amin & dai_pre >= 0) = 0;
@@ -52,12 +49,9 @@ for i = 1:n
 end
 
 % ---- Update li and Li ---------------------- %
-% w_t = exp(-t); % Data weighting function
-% w_t = (t<4);
-% w_t = ones(1,1);
-
+% w_t = exp(-t); 
 for i = 1:n
-    w_t = norm([dx(i) dy(i)]);
+    w_t = norm([dx(i) dy(i)])/norm(K); % Data weighting function
     ki = kappa(px(i),py(i));
     phi_t = ki*a;
     dLi(:,:,i) = w_t*(ki'*ki);

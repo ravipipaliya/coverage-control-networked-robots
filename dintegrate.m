@@ -2,7 +2,7 @@ function Cvi = dintegrate(vx,vy,pi_t,ai_t,pos)
     global kappa K Fi;
     
     % Sample points in voronoi region
-    cnt = 10000;
+    cnt = 10000; % Sample points
     xp = min(vx) + rand(cnt,1)*(max(vx)-min(vx));
     yp = min(vy) + rand(cnt,1)*(max(vy)-min(vy));
     in = inpolygon(xp,yp,vx,vy);

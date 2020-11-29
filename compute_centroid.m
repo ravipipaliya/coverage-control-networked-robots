@@ -27,23 +27,3 @@ for i = 1:n
         [Cv(:,pos_x)] = p(i,:)';
     end
 end
-
-% scatter(Cv(1,:),Cv(2,:),'r*')
-
-
-% polyin = polyshape({x},{y});
-% [a,b] = centroid(polyin);
-% plot(polyin)
-
-% g = @(m,n) exp(-(m+n).^2);
-% g=@(x,y)exp(x+y);
-% g = @(x,y) eval(subs(q(1)+q(1),q,[x;y]))
-% g = @(x,y) sqrt(x.^2+y.^2)
-% g = @(x,y) 1/(sigma*sqrt(2*pi))*exp(-((x).^2 + (y).^2) /(2*sigma^2));
-% intpoly(g,[0,1,2],[0,1,0])
-% MonteCarlo_double(
-% intpoly(g,x,y)
-
-% k = kappa*Ai(:,pos_x)
-%     f = @(x,y) eval(subs(k,q,[x;y]));
-%     intpoly(f,[0,1,2],[0,1,0])
