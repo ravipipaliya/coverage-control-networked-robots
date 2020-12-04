@@ -66,4 +66,4 @@ disp(t)
 % disp(ai(1:2,:))
 disp(mean(vecnorm(a-ai))) % paramter convergence
 % disp(ai)
-% disp(datestr(now,'HH:MM:SS.FFF'))
+

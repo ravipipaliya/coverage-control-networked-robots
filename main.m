@@ -2,11 +2,16 @@
 % Project - Ravi Pipaliya
 % Distributed Adaptive coverage control
 % 11/22/2020
+% ----------------------------------------------------------------------- %
+% ----------------------------------------------------------------------- %
+% ----------------------------------------------------------------------- %
+
 % clear all;
+rng('default'); % Setting seed for reproducibility
 global n K Tau g psi h;
 global amin Fi kappa a;
 
-%---- Initialize ----%
+%% Initialize ----%
 n = 20; % # of robots
 K = 3*eye(2); % Control gain matrix
 Tau = eye(9); 
@@ -14,12 +19,11 @@ g = 65; % Learning rate <100
 psi = 15; % Consensus weight <20
 h=0.01; % ode step size
 
-%---- Initial Positions ----%
-rng('default'); % Setting seed for reproducibility
+%% Initial Positions ----%
 x0 = 1*rand(n,1);  % Initial x
 y0 = 1*rand(n,1);  % Initial y
 
-%---- Model paramters ----%
+%% Model paramters ----%
 amin = 0.1; % minimum weight
 a = [100 amin*ones(1,7) 100]'; % True weights
 ai = amin * ones(9,n); % 9X1 for 
@@ -27,7 +31,7 @@ li = zeros(9,n);
 Li = zeros(9,9,n);
 Fi = zeros(9,9,n);
 
-%---- Basis function ----%
+%% Basis function ----%
 % q = sym('q',[2,1]);
 syms qx qy;
 sigma = 0.18; % Gaussian sd
@@ -46,13 +50,12 @@ kappa = @(qx,qy) ...
     1/(sigma^2*(2*pi))*exp(-((qx-mu(1,8)).^2 + (qy-mu(2,8)).^2) /(2*sigma^2)),...
     1/(sigma^2*(2*pi))*exp(-((qx-mu(1,9)).^2 + (qy-mu(2,9)).^2) /(2*sigma^2))];
 
-%---- Simulation ----%
-tspan = 0:h:10;
+%% Simulation ----%
+tspan = 0:h:2;
 z0 = [x0; y0; ai(:); li(:); Li(:)];  % Initial state
-% [t,z] = ode45(@cvtODE,tspan,z0);
-z = ode1(@cvtODE,tspan,z0);
+z = ode1(@cvtODE,tspan,z0); % Fixed time step ode
 
-%---- Plots ----%
+%% Plots ----%
 % Initial configuration
 figure
 voronoi(x0,y0,'b.')
@@ -91,6 +94,6 @@ figure;
 voronoi(pxn,pyn,'b.');
 hold on;
 for i=1:n
-    plot(pxi(i,1)',pyi(i,1)','ko')
+    plot(pxi(i,end)',pyi(i,end)','ko')
     plot(pxi(i,:)',pyi(i,:)','--')
 end
