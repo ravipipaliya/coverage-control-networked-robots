@@ -6,39 +6,28 @@
 function dz = cvtODE(t,z)
 
 global n h K Fi amin Tau g psi a kappa;
+global est_pos_err tru_pos_err;
 
 % ------------------------------------------------- %
 % ---- The Adaptive Coverage Control Algorithm ---- %
 % ------------------------------------------------- %
+% Initalize
 [px,py,ai,li,Li] = reshape_state(z);
-% ai(ai<amin) = amin;
 dai = zeros(size(ai));
 dli = zeros(size(li));
 dLi = zeros(size(Li));
 
-% ---- Voronoi regions & Centroid calcuation ---- %
-Cv = compute_centroid(px,py,ai); % Computes Fi as well
-% voronoi(px,py,'b.');
-% hold on;
-% scatter(Cv(1,:),Cv(2,:));
+% Voronoi regions & Centroid calcuation
+[Cv,Cv_true,L] = compute_centroid(px,py,ai); % Computes Fi as well
 
-% ---- Apply control input: ui = -K(Cvi - pi)- %
+% Control law: ui = -K(Cvi - pi)
 dx = K(1,1)*(Cv(1,:)' - px);
 dy = K(2,2)*(Cv(2,:)' - py);
+est_pos_err(round(t/h+1)) = mean(vecnorm([(Cv(1,:)' - px),(Cv(2,:)' - py)]'));
+tru_pos_err(round(t/h+1)) = mean(vecnorm([(Cv_true(1,:)' - px),(Cv_true(2,:)' - py)]'));
 
-% ---- Update ai ------------------------------- %
-T = delaunayTriangulation(px,py);
-ed = edges(T);
-L = zeros(n,n);
-for ind = 1:length(ed)
-    L(ed(ind,1),ed(ind,2))= -1;
-    L(ed(ind,2),ed(ind,1))= -1;
-end
-L = L + diag(-1*sum(L,2));
+% Adaption laws for paramter estimate
 s = ai*L';
-% disp(ai(1,1))
-% disp(norm(s))
-
 for i = 1:n
     dai_pre = -(Fi(:,:,i)*ai(:,i)) - g*(Li(:,:,i)*ai(:,i) - li(:,i)) - psi*s(:,i);
     Iproji = zeros(9,1);
@@ -48,7 +37,7 @@ for i = 1:n
     dai(:,i) = Tau*(dai_pre - diag(Iproji)*dai_pre);    
 end
 
-% ---- Update li and Li ---------------------- %
+% Update li and Li
 % w_t = exp(-t); 
 for i = 1:n
     w_t = norm([dx(i) dy(i)])/norm(K); % Data weighting function
@@ -58,12 +47,11 @@ for i = 1:n
     dli(:,i) = w_t*(phi_t)*ki';
 end
 
+% State update
 dz = [dx; dy; dai(:); dli(:); dLi(:)]; 
 
-% ---- Debugging ---------------------------- %
-% disp(px(1))
+%% Debugging ---------------------------- %
 disp(t)
-% disp(ai(1:2,:))
-disp(mean(vecnorm(a-ai))) % paramter convergence
-% disp(ai)
-
+disp(mean(vecnorm(a-ai))) % paramter error
+% disp(norm([dx,dy])) % distance to centroid
+end
