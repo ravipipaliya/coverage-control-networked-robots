@@ -2,6 +2,16 @@
 
 This respository implements the algorithm proposed in the paper ["Decentralized, adaptive coverage control for networked robots"](http://web.mit.edu/nsl/www/preprints/Adaptive_Coverage08.pdf).
 
+## Simulation plots
+
+* **Basic (Non-concensus) controller** (t = 0 to t = 30)
+
+![Non-Consensus controller](gifs/nonconsensus_130_0.gif)
+
+* **Concensus controller** (t = 0 to t = 30)
+
+![Consensus controller](gifs/consensus_65_15.gif)
+
 ## Results
 * **Controller with known sensory distribution**
 
